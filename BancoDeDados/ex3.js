@@ -1,8 +1,6 @@
 
 const database = {
-    tables: {
-       
-    },
+    tables: {},
     createTable(statment) {
         
         const regexp = /create table ([a-z]+) \((.+)\)/;
