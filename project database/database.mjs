@@ -6,6 +6,7 @@ export class Database {
         this.tables = {};
         this.parser = new Parser();
     }
+
     createTable(parsedStatement) {
         let [,tableName, columns] = parsedStatement;
         this.tables[tableName] = {
@@ -19,6 +20,7 @@ export class Database {
             this.tables[tableName].columns[name] = type;
         }
     }
+
     insert(parsedStatement) {
         let [,tableName, columns, values] = parsedStatement;
         columns = columns.split(", "); 
@@ -30,6 +32,7 @@ export class Database {
             row[column] = value;
         }
         this.tables[tableName].data.push(row);
+
     }
     select(parsedStatement) {
         let [, columns, tableName, whereClause] = parsedStatement;
@@ -49,6 +52,7 @@ export class Database {
             return selectedRow;
         });
         return rows;
+
     }
     delete (parsedStatement) {
         let [, tableName, whereClause] = parsedStatement;
@@ -61,13 +65,18 @@ export class Database {
             this.tables[tableName].data = [];
         }        
     }
-    execute(statement) {
-        const result = this.parser.parse(statement);
-        if (result) {
-            return this[result.command](result.parsedStatement);
-        }
-        const message = `Syntax error: "${statement}"`;
-        throw new DatabaseError(statement, message);
-    }
 
+    execute(statement) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+            const result = this.parser.parse(statement);
+            if (result) {
+            resolve(this[result.command](result.parsedStatement));
+            }
+            const message = `Syntax error: "${statement}"`;
+            reject (new DatabaseError(statement, message));
+        }, 1000);
+        });
+        
+    }
 }
